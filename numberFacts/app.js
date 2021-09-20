@@ -3,18 +3,22 @@
 let baseUrl = 'http://numbersapi.com';
 
 //1
-let randomNum = Math.floor(Math.random() * 100 + 1);
-$.getJSON(`${baseUrl}/${randomNum}/?json`).then((data) => {
-    console.log(data);
-});
+async function getNumber(number) {
+    try {
+        let res = await axios.get(`${baseUrl}/${number}/?json`);
+        console.log(res.data.text);
+    } catch (e) {
+        console.log('Error calling numbers api.', e);
+    }
+}
 
 //2 & 3
 
-let fourNumPromises = [];
-
-for (let i = 1; i < 5; i++) {
-    fourNumPromises.push(axios.get(`${baseUrl}/${i}/?json`));
+async function getNumbers(number, factsCount) {
+    let numPromises = [];
+    for (let i = 0; i < factsCount; i++) {
+        numPromises.push(axios.get(`${baseUrl}/${number}/?json`));
+    }
+    let numbers = await Promise.all(numPromises);
+    numbers.forEach((number) => $('body').append(`<p>${number.data.text}</p>`));
 }
-Promise.all(fourNumPromises)
-    .then((promisesArr) => promisesArr.forEach((promise) => $('body').append(`<p>${promise.data.text}</p>`)))
-    .catch((err) => console.error(err));
